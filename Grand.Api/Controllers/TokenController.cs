@@ -11,9 +11,9 @@ namespace Grand.Api.Controllers
 {
     [ApiController]
     [Area("Api")]
-    [Route("[area]/[controller]/[action]")]
+    [Route("[area]/[controller]/")]
     [ApiExplorerSettings(IgnoreApi = false)]
-    [SwaggerTag(description:"Create token")]
+    [SwaggerTag(description: "Create token")]
     public class TokenController : Controller
     {
         private readonly IMediator _mediator;
@@ -25,14 +25,14 @@ namespace Grand.Api.Controllers
 
         [AllowAnonymous]
         [IgnoreAntiforgeryToken]
-        [HttpPost]
+        [HttpPost("Create")]
         public async Task<IActionResult> Create([FromBody] LoginModel model)
         {
             var claims = new Dictionary<string, string>();
             claims.Add("Email", model.Email);
 
             var token = await _mediator.Send(new GenerateTokenCommand() { Claims = claims });
-            return Content(token);
+            return Content(token.Value.ToString());
         }
     }
 }

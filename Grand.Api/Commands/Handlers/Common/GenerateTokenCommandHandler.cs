@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Grand.Api.Commands.Handlers.Common
 {
-    public class GenerateTokenCommandHandler : IRequestHandler<GenerateTokenCommand, string>
+    public class GenerateTokenCommandHandler : IRequestHandler<GenerateTokenCommand, JwtToken>
     {
         private readonly ApiConfig _apiConfig;
 
@@ -16,7 +16,7 @@ namespace Grand.Api.Commands.Handlers.Common
         {
             _apiConfig = apiConfig;
         }
-        public async Task<string> Handle(GenerateTokenCommand request, CancellationToken cancellationToken)
+        public async Task<JwtToken> Handle(GenerateTokenCommand request, CancellationToken cancellationToken)
         {
             var token = new JwtTokenBuilder();
             token.AddSecurityKey(JwtSecurityKey.Create(_apiConfig.SecretKey));
@@ -30,7 +30,7 @@ namespace Grand.Api.Commands.Handlers.Common
             token.AddExpiry(_apiConfig.ExpiryInMinutes);
             token.Build();
 
-            return await Task.FromResult(token.Build().Value);
+            return await Task.FromResult(token.Build());
         }
     }
 }

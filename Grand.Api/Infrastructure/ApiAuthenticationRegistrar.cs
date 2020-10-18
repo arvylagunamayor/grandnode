@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Threading.Tasks;
 
@@ -33,6 +34,7 @@ namespace Grand.Api.Infrastructure
                     IssuerSigningKey = JwtSecurityKey.Create(config.SecretKey)
                 };
 
+                bool failed = false;
                 options.Events = new JwtBearerEvents
                 {
                     OnAuthenticationFailed = async context =>
@@ -41,9 +43,16 @@ namespace Grand.Api.Infrastructure
                         context.Response.StatusCode = 401;
                         context.Response.ContentType = "text/plain";
                         await context.Response.WriteAsync(context.Exception.Message);
+                        failed = true;
                     },
                     OnChallenge = context =>
                     {
+                        if(!failed)
+                        {
+                            context.Response.StatusCode = 401;
+                            context.Response.ContentType = "text/plain";
+                        }
+                        failed = false;
                         context.HandleResponse();
                         return Task.CompletedTask;
                     },
